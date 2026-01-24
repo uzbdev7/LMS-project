@@ -7,17 +7,33 @@ import { PrismaModule } from './prisma/prisma.module';
 import { SmsModule } from './sms/sms.module'; 
 import { ProfilesModule } from './profiles/profiles.module';
 import { CategoriesModule } from './categories/categories.module';
+import { CoursesModule } from './courses/courses.module';
+import { CourseRatingModule } from './course-rating/course-rating.module';
+import { SectionLessonModule } from './section-lesson/section-lesson.module';
+import { LessonsModule } from './lessons/lessons.module';
+import { LessonFilesModule } from './lesson-files/lesson-files.module';
+import { HomeworksModule } from './homeworks/homeworks.module';
+import { HomeworkSubmissionsModule } from './homework-submissions/homework-submissions.module';
+import { LessonViewModule } from './lesson-view/lesson-view.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // 2. Buni barcha modullar ko'rishi uchun qo'shing
+      isGlobal: true,
     }),
     PrismaModule, 
     SmsModule,
     UsersModule,
     ProfilesModule,
-    CategoriesModule,  
+    CategoriesModule,
+    CoursesModule,
+    CourseRatingModule,
+    SectionLessonModule,
+    LessonsModule,
+    LessonFilesModule,
+    HomeworksModule,
+    HomeworkSubmissionsModule,
+    LessonViewModule,  
   ],
   controllers: [AppController], 
   providers: [AppService],    

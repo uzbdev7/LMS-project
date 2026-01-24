@@ -9,14 +9,14 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true,
+      forbidNonWhitelisted: false,
       transform: true, 
     }),
   );
 
   const config = new DocumentBuilder()
-    .setTitle('CRM Project API')
-    .setDescription('User Auth, SMS Verification va CRM tizimi uchun API hujjatlari')
+    .setTitle('LMS loyihasinig API lari.')
+    .setDescription('LMS loyihasining backend qismi uchun yaratilgan API hujjatlari.')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -24,7 +24,7 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'JWT',
-        description: 'Enter JWT token',
+        description: 'JWT tokenni kiriting',
         in: 'header',
       },
       'JWT-auth', 

@@ -31,7 +31,6 @@ export class CourseCategoriesService {
     return category
   }
 
-
 async update(id: number, updateCategoryDto: UpdateCategoryDto) {
 
   const category = await this.prisma.courseCategory.findUnique({ where: { id } });
