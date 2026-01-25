@@ -9,13 +9,13 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UpdateSubmissionDto } from './dto/update-homework-submission.dto';
 
 @ApiTags('Homework Submissions')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard,RolesGuard)
 @Controller('api/homework-submissions')
 export class HomeworkSubmissionsController {
   constructor(private readonly submissionsService: HomeworkSubmissionsService) {}
   
   @Post()
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles('ADMIN','STUDENT')
   @ApiOperation({ summary: 'Vazifa topshirish' })
   create(@Body() dto: CreateSubmissionDto, @Req() req: any) {
@@ -28,14 +28,10 @@ export class HomeworkSubmissionsController {
   @Roles('ADMIN','STUDENT')
   @ApiOperation({ summary: 'Mening topshirgan vazifalarim' })
   findMy(@Req() req: any) {
-    console.log('User ROLE:', req.user.role);
-    console.log('User ID:', req.user.id);
     return this.submissionsService.findMySubmissions(req.user.id);
   }
 
   @Get('homework/:homeworkId')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles('ADMIN','STUDENT')
   @ApiOperation({ summary: 'Ma’lum bir vazifa bo‘yicha barcha topshiriqlarni olish (Admin/Teacher uchun)' })
   findByHomework(@Param('homeworkId', ParseIntPipe) homeworkId: number) {
@@ -43,8 +39,6 @@ export class HomeworkSubmissionsController {
   }
 
   @Patch(':id')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('STUDENT','ADMIN') 
   @ApiOperation({ summary: 'Topshirilgan vazifani tahrirlash' })
   @ApiResponse({ status: 200, description: 'Vazifa muvaffaqiyatli yangilandi' })
@@ -59,8 +53,6 @@ export class HomeworkSubmissionsController {
   }
   
   @Patch('review/:id')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles('MENTOR','ADMIN')
   @ApiOperation({ summary: 'Vazifani tekshirish (statusni o‘zgartirish)' })
   review(

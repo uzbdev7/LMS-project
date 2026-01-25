@@ -236,19 +236,19 @@ model HomeworkSubmission {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-model Exam {
-  id        Int        @id @default(autoincrement())
-  question  String
-  variantA  String
-  variantB  String
-  variantC  String
-  variantD  String
-  answer    ExamAnswer
-  sectionId Int
-  createdAt DateTime   @default(now())
+  model Exam {
+    id        Int        @id @default(autoincrement())
+    question  String
+    variantA  String
+    variantB  String
+    variantC  String
+    variantD  String
+    answer    ExamAnswer
+    sectionId Int
+    createdAt DateTime   @default(now())
 
-  section SectionLesson @relation(fields: [sectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
+    section SectionLesson @relation(fields: [sectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  }
 
 model ExamResult {
   id        Int      @id @default(autoincrement())

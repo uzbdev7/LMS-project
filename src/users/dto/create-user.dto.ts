@@ -25,10 +25,10 @@ export class CreateUserDto {
   @MinLength(6, { message: "Parol kamida 6 ta belgidan iborat bo'lishi kerak" })
   password: string;
 
-  @ApiPropertyOptional({ enum: UserRole, default: UserRole.STUDENT })
+  @ApiHideProperty() 
   @IsEnum(UserRole)
   @IsOptional()
-  role?: UserRole;
+  role: UserRole = UserRole.STUDENT; 
 }
 
 export class VerifyOtpDto {

@@ -15,6 +15,12 @@ import { LessonFilesModule } from './lesson-files/lesson-files.module';
 import { HomeworksModule } from './homeworks/homeworks.module';
 import { HomeworkSubmissionsModule } from './homework-submissions/homework-submissions.module';
 import { LessonViewModule } from './lesson-view/lesson-view.module';
+import { LastActivityModule } from './last-activity/last-activity.module';
+import { PurchasedCoursesModule } from './purchased-courses/purchased-courses.module';
+import { ExamsModule } from './exams/exams.module';
+import { ExamResultsModule } from './exam-results/exam-results.module';
+import { QuestionsModule } from './questions/questions.module';
+import { QuestionAnswerModule } from './question-answer/question-answer.module';
 
 @Module({
   imports: [
@@ -33,7 +39,13 @@ import { LessonViewModule } from './lesson-view/lesson-view.module';
     LessonFilesModule,
     HomeworksModule,
     HomeworkSubmissionsModule,
-    LessonViewModule,  
+    LessonViewModule,
+    LastActivityModule,
+    PurchasedCoursesModule,
+    ExamsModule,
+    ExamResultsModule,
+    QuestionsModule,
+    QuestionAnswerModule,  
   ],
   controllers: [AppController], 
   providers: [AppService],    

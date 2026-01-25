@@ -1,75 +1,70 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Get, Param, UseInterceptors, Put, ParseIntPipe, Delete  } from '@nestjs/common';
-import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiBody, ApiTags } from '@nestjs/swagger';
-import { RolesGuard } from 'src/auth/role.guard';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateCourseCategoryDto } from './dto/create-category.dto';
-import { CourseCategoriesService } from './categories.service';
+import { 
+  Controller, Post, Body, UseGuards, HttpCode, 
+  HttpStatus, Get, Param, UseInterceptors, Put, 
+  ParseIntPipe, Delete 
+} from '@nestjs/common';
+import { 
+  ApiBearerAuth, ApiConsumes, ApiOperation, 
+  ApiBody, ApiTags, ApiUnauthorizedResponse 
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+
+import { CourseCategoriesService } from './categories.service';
+import { CreateCourseCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/role.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+
 @ApiTags('Categories')
-@Controller('categories')
+@ApiBearerAuth('JWT-auth')
+@ApiUnauthorizedResponse({ description: 'Token xato yoki topilmadi' })
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('api/categories')
 export class CourseCategoriesController {
   constructor(private readonly service: CourseCategoriesService) {}
 
-  @Post('/create')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Post('create')
   @Roles('ADMIN')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor('')) 
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'ADMIN' })
+  @ApiOperation({ summary: 'Yangi kategoriya yaratish | ADMIN' })
   @ApiBody({ type: CreateCourseCategoryDto })
-  async create(
-    @Body() dto: CreateCourseCategoryDto
-  ) {
-
+  @UseInterceptors(FileInterceptor('icon')) 
+  async create(@Body() dto: CreateCourseCategoryDto) {
     return this.service.create(dto);
   }
 
-  @Get('category/getAll')
-  @UseGuards(JwtAuthGuard,RolesGuard)
-  @Roles('ADMIN','STUDENT','ASSISTANT','MENTOR')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({summary:'ADMIN | STUDENT | ASSISTANT | MENTOR'})
-  async getAll(){
-    return this.service.findAll()
-  }
-
-  @Get('category/get/:id')
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Put('update/:id')
   @Roles('ADMIN')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({summary:'ADMIN'})
-  async getById(@Param('id') id: string) {
-  const userId = parseInt(id, 10);
-    return this.service.findOne(userId)
-  }
-
-  @Put('category/update/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'ADMIN updates a category' })
-  async updateCategory(
-    @Param('id', ParseIntPipe) id: number,   
-    @Body() updateCategoryDto: UpdateCategoryDto, 
+  @ApiOperation({ summary: 'Kategoriyani tahrirlash | ADMIN' })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCategoryDto,
   ) {
-    return this.service.update(id, updateCategoryDto);
+    return this.service.update(id, dto);
   }
 
-  @Delete('category/delete/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Delete('delete/:id')
   @Roles('ADMIN')
-  @HttpCode(HttpStatus.NO_CONTENT) 
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'ADMIN deletes a category' })
-  async deleteCategory(
-    @Param('id', ParseIntPipe) id: number, 
-  ) {
-    return this.service.remove(id); 
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Kategoriyani o‘chirish | ADMIN' })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.service.remove(id);
   }
 
+  @Get('all')
+  @Roles('ADMIN', 'STUDENT', 'ASSISTANT', 'MENTOR')
+  @ApiOperation({ summary: 'Barcha kategoriyalarni olish | ADMIN, STUDENT, MENTOR' })
+  async getAll() {
+    return this.service.findAll();
+  }
+
+  @Get('get/:id')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Kategoriyani ID bo‘yicha olish | ADMIN' })
+  async getById(@Param('id', ParseIntPipe) id: number) {
+    return this.service.findOne(id);
+  }
 }

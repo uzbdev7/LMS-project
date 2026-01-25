@@ -6,6 +6,7 @@ import { SmsService } from 'src/sms/sms.service';
 import { CreateUserDto, RefreshTokenDto, RequestOtpDto, ResetPasswordDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -15,29 +16,34 @@ export class UsersService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async register(dto: CreateUserDto) {
-    const { phone, password } = dto;
+async register(dto: CreateUserDto) {
+  const { phone, password } = dto;
 
-    const existingUser = await this.prisma.user.findFirst({ where: { phone } });
-    if (existingUser) throw new BadRequestException('Bu raqam allaqachon ro‘yxatdan o‘tgan');
+  const existingUser = await this.prisma.user.findFirst({ where: { phone } });
+  if (existingUser) throw new BadRequestException('Bu raqam allaqachon ro‘yxatdan o‘tgan');
 
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashedPassword = await bcrypt.hash(password, 10);
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    await this.cacheManager.set(
-      `otp_${phone}`, 
-      { ...dto, password: hashedPassword, otpCode }, 
-      120000
-    );
+  await this.cacheManager.set(
+    `otp_${phone}`, 
+    { 
+      ...dto, 
+      password: hashedPassword, 
+      role: UserRole.STUDENT, 
+      otpCode 
+    }, 
+    120000 
+  );
 
-    await this.smsService.sendOtp(phone, otpCode);
+  await this.smsService.sendOtp(phone, otpCode);
 
-    return { 
-      status: 'success', 
-      message: "Tasdiqlash kodi yuborildi", 
-      phone 
-    };
-  }
+  return { 
+    status: 'success', 
+    message: "Tasdiqlash kodi yuborildi", 
+    phone 
+  };
+}
 
 
   async verifyOtp(phone: string, code: string) {

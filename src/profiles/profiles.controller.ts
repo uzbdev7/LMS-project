@@ -1,112 +1,87 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Put } from '@nestjs/common';
+import { 
+  Controller, Get, Body, Patch, Param, 
+  UseGuards, Put, ParseIntPipe 
+} from '@nestjs/common';
+import { 
+  ApiBearerAuth, ApiBody, ApiConsumes, 
+  ApiOperation, ApiResponse, ApiTags, 
+  ApiUnauthorizedResponse 
+} from '@nestjs/swagger';
+
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { RolesGuard } from 'src/auth/role.guard';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
 import { UpsertMentorProfileDto } from './dto/mentor-profile.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/role.guard';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @ApiTags('Profile')
-@Controller('api')
+@ApiBearerAuth('JWT-auth')
+@ApiUnauthorizedResponse({ description: 'Token yoq yoki notogri' })
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('api/profile') 
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService,
-    private readonly prismaService:PrismaService
-  ) {}
+  constructor(private readonly profilesService: ProfilesService) {}
 
-  @Get('profile/me')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard,RolesGuard)
-    @ApiResponse({
-    status: 200,
-    description: 'Foydalanuvchi profili',
-    schema: {
-      example: {
-        success: true,
-        data: {},
-      },
-    },
-  })
-  @ApiUnauthorizedResponse({ description: 'Token yoq yoki notogri' })
+  @Get('me')
+  @ApiOperation({ summary: 'Joriy foydalanuvchi profilini olish' })
+  @ApiResponse({ status: 200, description: 'Muvaffaqiyatli', schema: { example: { success: true, data: {} } } })
   async getMyProfile(@GetUser() user: any) {
-    const userId = user.sub || user.id;
-
-    return this.profilesService.getMyProfile(userId);
+    return this.profilesService.getMyProfile(user.id);
   }
 
-@Patch('profile/me/update')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiConsumes('application/json') 
+  @Patch('me/update')
+  @ApiConsumes('application/json')
+  @ApiOperation({ summary: 'Profil ma’lumotlarini yangilash' })
   @ApiBody({ type: UpdateProfileDto })
-  updateMyProfile(
+  async updateMyProfile(
     @GetUser() user: any,
-    @Body() updateProfileDto: UpdateProfileDto,
+    @Body() dto: UpdateProfileDto,
   ) {
-    console.log(updateProfileDto); 
-    return this.profilesService.updateProfile(user.id, updateProfileDto);
+    return this.profilesService.updateProfile(user.id, dto);
   }
 
-  @Patch('profile/me/update/phone')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'MENTOR | STUDENT | ASSISTANT'})
-  @ApiBody({ type: UpdatePhoneDto })
+  @Patch('me/update/phone')
+  @ApiOperation({ summary: 'Telefon raqamini yangilash | MENTOR, STUDENT, ASSISTANT' })
   async updatePhone(
     @GetUser() user: any,
-    @Body() updatePhoneDto: UpdatePhoneDto
+    @Body() dto: UpdatePhoneDto
   ) {
-    return this.profilesService.updatePhone(user.id, updatePhoneDto);
+    return this.profilesService.updatePhone(user.id, dto);
   }
 
-@Get('profile/mentor')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('MENTOR')
-@ApiBearerAuth('JWT-auth')
-@ApiOperation({ summary: 'MENTOR'})
-async mentorProfile(@GetUser() user: any) {
-  const userId = user.id || user.sub;
-  return this.profilesService.getMentorProfile(userId)
-}
+  @Get('mentor')
+  @Roles('MENTOR')
+  @ApiOperation({ summary: 'Mentor o’z profilini ko’rishi | MENTOR' })
+  async mentorProfile(@GetUser() user: any) {
+    return this.profilesService.getMentorProfile(user.id);
+  }
 
-@Put('profile/mentor/update')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('MENTOR','ADMIN')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'MENTOR | ADMIN' })
-  @ApiBody({ type: UpsertMentorProfileDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Mentor profile muvaffaqiyatli yangilandi',
-  })
+  @Put('mentor/update')
+  @Roles('MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Mentor profilini yaratish yoki yangilash | MENTOR, ADMIN' })
+  @ApiResponse({ status: 200, description: 'Mentor profili muvaffaqiyatli yangilandi' })
   async updateMentorProfile(
-    @GetUser('id') user: any,
+    @GetUser() user: any,
     @Body() dto: UpsertMentorProfileDto,
   ) {
-    const userId = user.id || user.sub
-    return this.profilesService.UpdateMentorProfile(userId, dto);
+    return this.profilesService.UpdateMentorProfile(user.id, dto);
   }
 
-  @Get('profile/all/mentor')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('all/mentor')
   @Roles('ADMIN')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'ADMIN'})
+  @ApiOperation({ summary: 'Barcha mentorlar ro’yxatini olish | ADMIN' })
   async mentorProfiles() {
-    return this.profilesService.getMentorProfiles()
+    return this.profilesService.getMentorProfiles();
   }
 
-  @Get('profile/mentor/:id')
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Get('mentor/:id')
   @Roles('ADMIN')
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({summary:'ADMIN'})
-  async getById(@Param('id') id: string) {
-  const userId = parseInt(id, 10);
-    return this.profilesService.FindById(userId)
+  @ApiOperation({ summary: 'Mentor profilini ID bo’yicha olish | ADMIN' })
+  async getById(@Param('id', ParseIntPipe) id: number) {
+    return this.profilesService.FindById(id);
   }
-
 }
