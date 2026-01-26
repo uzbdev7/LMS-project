@@ -1,42 +1,33 @@
-name: LMS project Deployment
-on:
-  push:
-    branches:
-      - main
+- name: Deploy over SSH and run Docker Compose
+  uses: appleboy/ssh-action@v1.0.3
+  with:
+    host: ${{ secrets.SSH_HOST }}
+    username: ${{ secrets.SSH_USER }}
+    key: ${{ secrets.SSH_KEY }}
+    port: 22
+    script: |
+      set -e
+      echo "Deploy started"
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+      cd /root
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      if [ ! -d "LMS-project/.git" ]; then
+        echo "Cloning repository..."
+        git clone https://github.com/uzbdev7/LMS-project
+      fi
 
-      - name: Deploy over SSH and run Docker Compose
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            echo "Creating project folder if it doesn't exist!"
-            mkdir -p /root
-            cd /root
+      cd LMS-project
 
-            if [ ! -d "LMS-project/.git" ]; then 
-              echo "Cloning repository for the first time!"
-              git clone https://github.com/uzbdev7/LMS-project
-            else
-                echo "Pulling latest changes!"
-                cd LMS-project
-                git pull origin main
-            fi
-              echo "Stopping containers"
-              docker compose down
+      echo "Pulling latest changes..."
+      git pull origin main
 
-              echo "Building containers"
-              docker compose build
+      echo "Stopping containers..."
+      docker compose down || true
 
-              echo "Starting containers"
-              docker compose up -d
-              echo "Deployment completed!"
+      echo "Building containers..."
+      docker compose build
+
+      echo "Starting containers..."
+      docker compose up -d
+
+      echo "Deployment completed!"
