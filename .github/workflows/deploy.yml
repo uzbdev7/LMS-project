@@ -19,9 +19,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-          echo "Creating project folder if it doesn't exist!"
-          mkdir -p /root
-          cd /root
+            echo "Creating project folder if it doesn't exist!"
+            mkdir -p /root
+            cd /root
 
           if [ ! -d "LMS-project/.git" ]; then 
             echo "Cloning repository for the first time!"
@@ -40,4 +40,3 @@ jobs:
             echo "Starting containers"
             docker compose up -d
             echo "Deployment completed!"
-            
