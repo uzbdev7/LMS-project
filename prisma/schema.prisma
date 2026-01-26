@@ -47,7 +47,7 @@ model User {
   surname    String
   phone      String  @unique
   isVerified Boolean @default(false)
-  password   String   @unique
+  password   String   
   role       UserRole @default(STUDENT)
   created_at DateTime @default(now()) @map("created_at")
 
