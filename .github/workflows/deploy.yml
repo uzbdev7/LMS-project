@@ -26,11 +26,11 @@ jobs:
           if [ ! -d "LMS-project/.git" ]; then 
             echo "Cloning repository for the first time!"
             git clone https://github.com/uzbdev7/LMS-project
-            else
+          else
               echo "Pulling latest changes!"
               cd LMS-project
               git pull origin main
-            fi
+          fi
             echo "Stopping containers"
             docker compose down
 
