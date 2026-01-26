@@ -23,20 +23,20 @@ jobs:
             mkdir -p /root
             cd /root
 
-          if [ ! -d "LMS-project/.git" ]; then 
-            echo "Cloning repository for the first time!"
-            git clone https://github.com/uzbdev7/LMS-project
-          else
-              echo "Pulling latest changes!"
-              cd LMS-project
-              git pull origin main
-          fi
-            echo "Stopping containers"
-            docker compose down
+            if [ ! -d "LMS-project/.git" ]; then 
+              echo "Cloning repository for the first time!"
+              git clone https://github.com/uzbdev7/LMS-project
+            else
+                echo "Pulling latest changes!"
+                cd LMS-project
+                git pull origin main
+            fi
+              echo "Stopping containers"
+              docker compose down
 
-            echo "Building containers"
-            docker compose build
+              echo "Building containers"
+              docker compose build
 
-            echo "Starting containers"
-            docker compose up -d
-            echo "Deployment completed!"
+              echo "Starting containers"
+              docker compose up -d
+              echo "Deployment completed!"
