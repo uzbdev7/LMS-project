@@ -18,7 +18,7 @@ import {
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { RolesGuard } from 'src/auth/role.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'generated/prisma/enums';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Users') 
 @Controller('api/users')

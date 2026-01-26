@@ -1,6 +1,6 @@
 import { ApiProperty, ApiHideProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Matches, MinLength } from "class-validator";
-import { UserRole } from "generated/prisma/enums";
+import { UserRole } from "@prisma/client";
 
 export class CreateUserDto {
   @ApiProperty({ example: 'Aziz', description: 'Foydalanuvchi ismi' })
