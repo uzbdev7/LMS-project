@@ -187,4 +187,70 @@ async confirmResetPassword(dto: ResetPasswordDto) {
   };
 }
 
+
+  async getAll() {
+    const users = await this.prisma.user.findMany({
+      where: { role: 'STUDENT' },
+      select: {
+        id: true,
+        name: true,
+        surname: true,
+        phone: true,
+        role: true,
+        created_at: true,
+        assignedCourses: {
+          select: {
+            course: {
+              select: {
+                id: true,
+                name: true,
+                banner: true,
+                sectionLesson: {
+                  select: {
+                    lesson: {
+                      select: { id: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        lessonView: {
+          select: {
+            lessonId: true,
+            view: true,
+          }
+        },
+        homeworkSubmission: {
+          select: {
+            id: true,
+            status: true,
+          }
+        },
+        examResult: {
+          select: {
+            id: true,
+            passed: true,
+            corrects: true,
+            wrongs: true,
+          }
+        },
+        lastActivity: {
+          select: {
+            updatedAt: true,
+            course: {
+              select: { name: true }
+            }
+          }
+        },
+      },
+    });
+
+    return {
+      success: true,
+      data: users,
+      total: users.length,
+    };
+  }
 }

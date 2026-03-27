@@ -8,7 +8,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/role.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { retry } from 'rxjs';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Courses')
 @Controller('api/')
@@ -17,7 +17,7 @@ export class CourseController {
 
   @Post('create')
   @UseGuards(JwtAuthGuard,RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.MENTOR, UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({summary:'ADMIN'})
   @ApiConsumes('multipart/form-data')
@@ -66,7 +66,7 @@ export class CourseController {
 
   @Patch('course/update/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN, UserRole.MENTOR,UserRole.SUPERADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'ADMIN' })
   @ApiConsumes('multipart/form-data')
@@ -116,9 +116,9 @@ export class CourseController {
 
 @Get('get/course/all')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN', 'STUDENT', 'ASSISTANT', 'MENTOR')
+  @Roles('ADMIN', 'STUDENT', 'ASSISTANT', 'MENTOR',"SUPERADMIN")
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'ADMIN | STUDENT | ASSISTANT | MENTOR' })
+  @ApiOperation({ summary: 'ADMIN | STUDENT | ASSISTANT | MENTOR | SUPERADMIN' })
   @ApiQuery({ name: 'page', required: false, example: 1, description: 'Sahifa raqami' })
   @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Har bir sahifadagi elementlar soni' })
   @ApiQuery({ name: 'search', required: false, example: 'Kiberxavsizlik', description: 'Kurs nomi bo‘yicha qidiruv' })
@@ -135,19 +135,25 @@ export class CourseController {
   }
 
   @Get('course/get/:id')
-  @UseGuards(JwtAuthGuard,RolesGuard)
-  @Roles('ADMIN')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.ADMIN,
+    UserRole.SUPERADMIN,
+    UserRole.MENTOR,   // ← QO'SHILDI
+    UserRole.STUDENT,  // ← QO'SHILDI
+    UserRole.ASSISTANT // ← QO'SHILDI
+  )
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({summary:'ADMIN'})
+  @ApiOperation({ summary: 'ALL ROLES' })
   async getById(@Param('id') id: string) {
-    return this.courseService.findOne(id)
+    return this.courseService.findOne(id);
   }
 
   @Delete('course/delete/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.MENTOR)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'ADMIN' })
+  @ApiOperation({ summary: 'ADMIN, SUPERADMIN , MENTOR' })
   async removeCourse(@Param('id') id: string) {
     return this.courseService.remove(id);
   }
@@ -178,9 +184,9 @@ export class CourseController {
 
   @Get('mentor/courses')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('MENTOR','ADMIN') 
+  @Roles('MENTOR','ADMIN','SUPERADMIN') 
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'MENTOR | ADMIN' })
+  @ApiOperation({ summary: 'MENTOR | ADMIN | SUPERADMIN' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'search', required: false })

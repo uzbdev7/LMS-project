@@ -55,8 +55,8 @@ export class CourseCategoriesController {
   }
 
   @Get('all')
-  @Roles('ADMIN', 'STUDENT', 'ASSISTANT', 'MENTOR')
-  @ApiOperation({ summary: 'Barcha kategoriyalarni olish | ADMIN, STUDENT, MENTOR' })
+  @Roles("SUPERADMIN",'ADMIN', 'STUDENT', 'ASSISTANT', 'MENTOR')
+  @ApiOperation({ summary: 'Barcha kategoriyalarni olish => SUPERADMIN, ADMIN, STUDENT, MENTOR' })
   async getAll() {
     return this.service.findAll();
   }

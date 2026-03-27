@@ -1,7 +1,8 @@
 import { 
   Controller, Post, Body, HttpCode, HttpStatus, 
   UseInterceptors, UseGuards, 
-  Req
+  Req,
+  Get
 } from '@nestjs/common'; 
 import { 
   ApiTags, ApiOperation, ApiConsumes, 
@@ -79,4 +80,10 @@ export class UsersController {
   async confirmReset(@Body() dto: ResetPasswordDto) {
     return this.usersService.confirmResetPassword(dto);
   }
+
+    @Get('get/all/student')
+    @ApiOperation({ summary: 'Hamma darslar royhati.' })
+    async getAll() {
+      return this.usersService.getAll();
+    }
 }

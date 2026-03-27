@@ -56,6 +56,16 @@ private async uploadToCloudinary(file: Express.Multer.File): Promise<string> {
     return lesson;
   }
 
+  async getAll() {
+    const lesson = await this.prisma.lessons.findMany();
+    if (!lesson) throw new NotFoundException('Dars topilmadi');
+    return {
+      success:true,
+      data:lesson
+    };
+    
+  }
+
   async getSingle(lessonId: string) {
     const lesson = await this.prisma.lessons.findUnique({
       where: { id: lessonId },

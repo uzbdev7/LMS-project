@@ -59,6 +59,12 @@ export class LessonsController {
     return this.lessonsService.getDetail(id);
   }
 
+  @Get('get/all')
+  @ApiOperation({ summary: 'Hamma darslar royhati.' })
+  async getAll() {
+    return this.lessonsService.getAll();
+  }
+
   @Get('single/:lessonId')
   @ApiOperation({ summary: 'Bitta dars ma’lumotlarini olish' })
   async getSingle(@Param('lessonId') lessonId: string) {
