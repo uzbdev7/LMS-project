@@ -26,7 +26,7 @@ services:
       - .env 
     environment:
 
-      DATABASE_URL: postgresql://neondb_owner:npg_AISNVb3jlye4@ep-royal-scene-agft7jbo-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=verify-full
+      DATABASE_URL: postgresql://postgres:12345@db:5432/lms_db
 
     command: sh -c "npx prisma generate && npx prisma db push && pnpm run start:dev"
 
