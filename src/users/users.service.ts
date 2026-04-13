@@ -253,4 +253,30 @@ async confirmResetPassword(dto: ResetPasswordDto) {
       total: users.length,
     };
   }
+
+  async updateUserRoleById(id: number, role: UserRole) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('Foydalanuvchi topilmadi');
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id },
+      data: { role },
+      select: {
+        id: true,
+        name: true,
+        surname: true,
+        phone: true,
+        role: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Foydalanuvchi roli muvaffaqiyatli yangilandi',
+      data: updatedUser,
+    };
+  }
 }

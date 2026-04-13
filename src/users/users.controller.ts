@@ -2,7 +2,10 @@ import {
   Controller, Post, Body, HttpCode, HttpStatus, 
   UseInterceptors, UseGuards, 
   Req,
-  Get
+  Get,
+  Patch,
+  Param,
+  ParseIntPipe
 } from '@nestjs/common'; 
 import { 
   ApiTags, ApiOperation, ApiConsumes, 
@@ -13,7 +16,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { 
   CreateUserDto, VerifyOtpDto, LoginDto, 
-  RefreshTokenDto, ResetPasswordDto, RequestOtpDto 
+  RefreshTokenDto, ResetPasswordDto, RequestOtpDto,
+  UpdateUserRoleDto
 } from './dto/create-user.dto';
 
 import { GetUser } from '../auth/decorators/get-user.decorator';
@@ -36,7 +40,7 @@ export class UsersController {
     createUserDto.role = UserRole.STUDENT;
     return this.usersService.register(createUserDto);
   }
-
+  
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data') 
@@ -81,9 +85,21 @@ export class UsersController {
     return this.usersService.confirmResetPassword(dto);
   }
 
-    @Get('get/all/student')
-    @ApiOperation({ summary: 'Hamma darslar royhati.' })
-    async getAll() {
-      return this.usersService.getAll();
-    }
+  @Get('get/all/student')
+  @ApiOperation({ summary: 'Hamma darslar royhati.' })
+  async getAll() {
+    return this.usersService.getAll();
+  }
+
+  @Patch(':id/role')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'ADMIN | SUPERADMIN)' })
+  async updateRoleById(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserRoleDto,
+  ) {
+    return this.usersService.updateUserRoleById(id, dto.role);
+  }
 }

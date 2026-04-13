@@ -6,24 +6,24 @@ export class CreateUserDto {
   @ApiProperty({ example: 'Aziz', description: 'Foydalanuvchi ismi' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'Rahimov', description: 'Foydalanuvchi familiyasi' })
   @IsString()
   @IsNotEmpty()
-  surname: string;
+  surname!: string;
   
   @ApiProperty({ example: '+998901234567', description: 'O‘zbekiston telefon raqami' })
   @IsString()
   @IsNotEmpty()
   @IsPhoneNumber('UZ') 
-  phone: string;
+  phone!: string;
 
   @ApiProperty({ example: 'Password123!', description: 'Kamida 6 ta belgidan iborat parol' })
   @IsString()
   @IsNotEmpty()
   @MinLength(6, { message: "Parol kamida 6 ta belgidan iborat bo'lishi kerak" })
-  password: string;
+  password!: string;
 
   @ApiHideProperty() 
   @IsEnum(UserRole)
@@ -36,38 +36,38 @@ export class VerifyOtpDto {
   @IsString()
   @IsNotEmpty()
   @IsPhoneNumber('UZ')
-  phone: string;
+  phone!: string;
 
   @ApiProperty({ example: '123456' })
   @IsString()
   @IsNotEmpty()
-  code: string;
+  code!: string;
 }
 
 export class LoginDto {
   @ApiProperty({ example: '+998883700025' })
   @IsString()
   @IsNotEmpty()
-  phone: string;
+  phone!: string;
 
   @ApiProperty({ example: 'Axrorbek123' })
   @IsString()
   @IsNotEmpty()
-  pass: string;
+  pass!: string;
 }
 
 export class RefreshTokenDto {
   @ApiProperty({ example: 'eyJhbGciOiJIUzI1Ni...' })
   @IsString()
   @IsNotEmpty()
-  refreshToken: string;
+  refreshToken!: string;
 }
 export class RequestOtpDto {
   @ApiProperty({ example: '+998901234567', description: 'Foydalanuvchi telefon raqami' })
   @IsString()
   @IsNotEmpty()
   @IsPhoneNumber('UZ')
-  phone: string;
+  phone!: string;
 }
 
 export class ResetPasswordDto {
@@ -75,14 +75,20 @@ export class ResetPasswordDto {
   @IsString()
   @IsNotEmpty()
   @IsPhoneNumber('UZ')
-  phone: string;
+  phone!: string;
 
   @ApiProperty({ example: '123456' })
   @IsNotEmpty()
-  otpCode: string;
+  otpCode!: string;
 
   @ApiProperty({ example: 'yangi_parol_123' })
   @IsString()
   @IsNotEmpty()
-  newPass: string;
+  newPass!: string;
+}
+
+export class UpdateUserRoleDto {
+  @ApiProperty({ enum: UserRole, example: UserRole.MENTOR })
+  @IsEnum(UserRole)
+  role!: UserRole;
 }
