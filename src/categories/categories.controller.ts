@@ -26,7 +26,7 @@ export class CourseCategoriesController {
   constructor(private readonly service: CourseCategoriesService) {}
 
   @Post('create')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SUPERADMIN')
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Yangi kategoriya yaratish | ADMIN' })
@@ -37,7 +37,7 @@ export class CourseCategoriesController {
   }
 
   @Put('update/:id')
-  @Roles('ADMIN')
+  @Roles('ADMIN','SUPERADMIN')
   @ApiOperation({ summary: 'Kategoriyani tahrirlash | ADMIN' })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -47,7 +47,7 @@ export class CourseCategoriesController {
   }
 
   @Delete('delete/:id')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SUPERADMIN')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Kategoriyani o‘chirish | ADMIN' })
   async remove(@Param('id', ParseIntPipe) id: number) {
@@ -62,7 +62,7 @@ export class CourseCategoriesController {
   }
 
   @Get('get/:id')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SUPERADMIN', 'STUDENT', 'ASSISTANT', 'MENTOR')
   @ApiOperation({ summary: 'Kategoriyani ID bo‘yicha olish | ADMIN' })
   async getById(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
